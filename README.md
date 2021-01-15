@@ -30,12 +30,18 @@ The first and the second trigram look like
   - [`“My` `dear` `Mr.`]
   - [`dear` `Mr.` `Bennet,”`]
 
-whereas for better text generation quotes should be stripped:
+whereas for better text generation quotes better be stripped:
 
   - [`My` `dear` `Mr.`]
   - [`dear` `Mr.` `Bennet,`]
 
 Punctuation and register can be handled so that seed words `mr` `bennet` would match a trigram with `Mr.` `Bennet,` words.
+
+### Testing
+
+```shell
+go test -race ./...
+````
 
 ## Running
 
