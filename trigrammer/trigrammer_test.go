@@ -62,19 +62,21 @@ func TestSplitter(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		var result []*trigram.Trigram
-		for tr := range extractTrigrams(tc.input) {
+		done := make(chan error)
+		for tr := range extractTrigrams(tc.input, done) {
 			result = append(result, tr)
 		}
 		assert.Equal(t, tc.expected, result)
+		assert.NoError(t, <-done)
 	}
 }
 
 func TestAll(t *testing.T) {
 	f, err := os.Open("test_data/pride-prejudice.txt")
 	if err != nil {
-		panic(err)
+		t.Fatalf("Error loading test file: %s", err)
 	}
-	defer f.Close()
-	Learn(f)
+	defer func() { _ = f.Close() }()
+	assert.NoError(t, Learn(f))
 	assert.True(t, len(Generate("It", "is")) > 0)
 }

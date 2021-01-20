@@ -32,8 +32,12 @@ func learnHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Print("Learning...")
 	start := time.Now()
-	trigrammer.Learn(r.Body)
-	log.Printf("Learned in %s", time.Since(start))
+	if err := trigrammer.Learn(r.Body); err != nil {
+		log.Printf("Error learning: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		log.Printf("Learned in %s", time.Since(start))
+	}
 	_ = r.Body.Close()
 }
 

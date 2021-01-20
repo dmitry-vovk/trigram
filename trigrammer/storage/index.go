@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -8,7 +9,7 @@ import (
 
 // thirdWords contains the list of third words in a trigram
 type thirdWords struct {
-	m       sync.Mutex
+	m       sync.RWMutex
 	number  int
 	indices map[uint32]int
 }
@@ -38,15 +39,15 @@ func (w *thirdWords) add(index uint32) *thirdWords {
 func (w *thirdWords) random() uint32 {
 	if w.number == 0 {
 		// Having a trigram without the third word should not happen
-		panic("possible bug! calling random on empty index")
+		log.Fatalf("Fatal error! Calling random on empty index.")
 	}
+	w.m.RLock()
+	defer w.m.RUnlock()
 	if len(w.indices) == 1 {
 		for index := range w.indices {
 			return index
 		}
 	}
-	w.m.Lock()
-	defer w.m.Unlock()
 	n := rand.Intn(w.number-1) + 1
 	m := 0
 	var index uint32
